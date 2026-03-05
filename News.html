@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年美伊全面衝突與「史詩狂怒行動」綜合戰略評估報告</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        },
+                        danger: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自定義捲動條 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, #3b82f6, #ef4444);
+            z-index: 50;
+            width: 0%;
+            transition: width 0.1s;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300 antialiased font-sans leading-relaxed selection:bg-brand-500 selection:text-white">
+
+    <!-- 閱讀進度條 -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 頂部導航 (Mobile Only) -->
+    <nav class="md:hidden bg-slate-950 border-b border-slate-800 p-4 sticky top-0 z-40 flex justify-between items-center">
+        <div class="text-brand-400 font-bold text-sm truncate">史詩狂怒行動報告</div>
+        <button id="mobileMenuBtn" class="text-slate-300 hover:text-white">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col p-6 backdrop-blur-sm transition-opacity">
+        <div class="flex justify-end mb-4">
+            <button id="closeMenuBtn" class="text-slate-300 hover:text-white text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex flex-col space-y-4 text-lg overflow-y-auto" id="mobileToc">
+            <!-- 內容由 JS 填充 -->
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row gap-8">
+        
+        <!-- 左側邊欄 (Desktop Only) -->
+        <aside class="hidden md:block w-1/4 shrink-0">
+            <div class="sticky top-8 bg-slate-800/50 rounded-2xl border border-slate-700 p-6 shadow-xl backdrop-blur-md">
+                <div class="text-xs font-bold tracking-wider text-slate-500 uppercase mb-4">目錄 (Table of Contents)</div>
+                <nav id="toc" class="flex flex-col space-y-3 text-sm">
+                    <a href="#hero" class="toc-link text-brand-400 font-bold transition-colors hover:text-brand-400 flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px]"></i> 封面
+                    </a>
+                    <a href="#ch1" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第一章：背景與戰略轉向
+                    </a>
+                    <a href="#ch2" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第二章：戰術執行與毀傷評估
+                    </a>
+                    <a href="#ch3" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第三章：斬首戰略與權力真空
+                    </a>
+                    <a href="#ch4" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第四章：水下交鋒與沉船事件
+                    </a>
+                    <a href="#ch5" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第五章：區域外溢與代理人連鎖
+                    </a>
+                    <a href="#ch6" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第六章：經濟金融震盪與危機
+                    </a>
+                    <a href="#ch7" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第七章：美國國內政治危機
+                    </a>
+                    <a href="#ch8" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 第八章：外交板塊重組與大國反應
+                    </a>
+                    <a href="#conclusion" class="toc-link text-slate-400 hover:text-brand-400 transition-colors flex items-start gap-2">
+                        <i class="fas fa-chevron-right mt-1 text-[10px] opacity-0"></i> 結論與戰略前瞻
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- 主要內容區 -->
+        <main class="w-full md:w-3/4 space-y-16">
+            
+            <!-- Hero Section -->
+            <section id="hero" class="scroll-mt-24">
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <i class="fas fa-globe-americas text-9xl text-brand-400"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-danger-500/20 text-danger-500 border border-danger-500/30 text-xs font-bold tracking-widest uppercase mb-6">
+                            <span class="w-2 h-2 rounded-full bg-danger-500 animate-pulse"></span>
+                            Highly Classified Assessment
+                        </div>
+                        <h1 class="text-3xl md:text-5xl font-black text-white leading-tight mb-6 tracking-tight">
+                            2026年美伊全面衝突與<br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-danger-500">「史詩狂怒行動」</span><br>
+                            綜合戰略評估報告
+                        </h1>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-slate-400 font-medium">
+                            <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                                <i class="far fa-calendar-alt"></i> 評估期間：2月28日至3月5日
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                                <i class="fas fa-shield-alt"></i> 狀態：進行中 (Active)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 1 -->
+            <section id="ch1" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">01</span>
+                    衝突爆發的地緣政治背景與戰略轉向
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>自2026年2月28日起，中東地區被捲入了一場徹底改變全球地緣政治板塊與權力平衡的全面性衝突。美國與以色列針對伊朗發動了代號分別為「史詩狂怒行動」（Operation Epic Fury）與「怒獅行動」（Operation Roaring Lion）的大規模聯合軍事打擊，標誌著華盛頓的對伊戰略從長期的「極限施壓」（Maximum Pressure）與外交遏制，正式發生了向「動力學斬首」（Kinetic Decapitation）與「政權更迭」（Regime Change）的典範轉移。</p>
+                    <p>此次衝突的爆發時機在國際外交史上極具爭議性與戲劇性。就在軍事行動啟動的前兩天（即2026年2月26日），美國與伊朗雙方代表才剛在瑞士日內瓦結束了近年來最具實質意義的核子談判回合，阿曼調停人甚至對外報告雙方取得了「實質性進展」，並同意繼續進行對話。然而，外交斡旋的表象在數小時內即被戰火粉碎。美國川普（Donald Trump）政府在決策過程中認定，伊朗的談判姿態僅是一種戰略掩護，目的是為其暗中推進長程彈道飛彈計畫以及重建在2025年6月「午夜之鎚行動」（Operation Midnight Hammer，當時摧毀了福爾多核燃料濃縮廠）中受損的核子設施爭取時間。</p>
+                    <p>美國政府對此次單方面發起的大規模軍事行動提出了多重戰略理由。核心論述在於「消除迫在眉睫的飛彈威脅」與「終止核武裝進程」。川普總統在授權行動的聲明中強調，這是一場為了保護美國人民、海外駐軍及盟友而必須執行的「防禦性」舉措，旨在徹底摧毀伊朗的彈道飛彈武庫、削弱其代理人恐怖網絡，並癱瘓其海軍力量。美國國務卿馬可·魯比歐（Marco Rubio）則提供了另一層面的戰略邏輯，指出美國選擇「先發制人」是因為掌握到以色列已準備好單方面發動攻擊，而這不可避免地會引發伊朗對美軍基地的報復，因此美軍必須掌握主動權。</p>
+                    <div class="bg-slate-800/50 border-l-4 border-brand-500 p-5 rounded-r-lg my-6 italic text-slate-400">
+                        以色列官方指出，情報顯示伊朗若做出政治決定，已經具備在兩週內將鈾濃縮至90%武器級濃度的能力，這種「衝刺能力」（Breakout capability）已觸及特拉維夫與華盛頓的絕對紅線，使得先發制人成為「別無選擇」的國家生存保衛戰。
+                    </div>
+                    <p>然而，從國際法與全球戰略架構的深層視角來看，這場戰役的合法性正遭受嚴厲檢視。該行動不僅未獲得聯合國安全理事會的授權，被廣泛視為對《聯合國憲章》禁止使用武力原則的公然違反，同時也是在未獲得美國國會正式宣戰的情況下由行政當局單方面啟動。隨著戰火進入第六天（截至3月5日），這場原本被設定為「雷射般精準」（Laser-focused）的外科手術式打擊，已經迅速外溢為一場牽動全球能源命脈、大國博弈與區域存亡的全面性地緣政治危機。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="ch2" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">02</span>
+                    聯軍空中戰役之戰術執行與目標毀傷評估
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>「史詩狂怒行動」與「怒獅行動」在規模、烈度與技術協同上，展現了當代空中與太空作戰的極致。自美東時間2月28日凌晨1時15分（德黑蘭時間上午9時45分）行動啟動以來，美以聯軍的攻勢呈現出高度結構化的作戰節奏。美國網絡司令部與太空司令部首先發動了非動力學（Non-kinetic）的電子戰與網路攻擊，大範圍癱瘓了伊朗的軍事通訊與指揮控制系統，隨後超過100架從陸地基地與兩個航空母艦打擊群起飛的戰鬥機與轟炸機進入攻擊位置。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">防空壓制與制空權的確立</h3>
+                    <p>戰役的第一階段重心聚焦於「防空壓制」（SEAD）。美國參謀長聯席會議主席丹·凱恩（Dan Caine）將軍於3月2日證實，聯軍已經在伊朗西部與首都德黑蘭上空建立了「局部制空權」。為達成此一戰略目標，聯軍在行動初期便精準摧毀了超過200個伊朗防空飛彈系統與雷達陣地。制空權的確立產生了決定性的戰術溢出效應：它不僅解除了先進匿蹤戰機（如F-35）的作戰限制，更使得美軍能夠在極低風險下部署攜帶重型鑽地彈的低代際傳統轟炸機（如B-1轟炸機），從而對伊朗深埋於地下的戰略設施進行毀滅性打擊。</p>
+                    <p>在此過程中，以色列空軍展現了極高的出擊頻率，至3月4日已向伊朗境內投擲了超過5,000枚精準導引炸彈，並在德黑蘭上空的一場空戰中，由一架F-35I戰機擊落了一架伊朗的Yak-130戰鬥教練機，創下此次衝突中首次有人駕駛戰機的空戰擊殺紀錄。</p>
+
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">戰略目標的系統性瓦解</h3>
+                    <p>在取得制空權後，聯軍的打擊範圍迅速擴展至伊朗國家軍事工業機器的核心。以下為截至3月5日，聯軍空中打擊的主要目標分類與戰略意圖分析：</p>
+                    
+                    <!-- Table 1 -->
+                    <div class="overflow-x-auto my-8 rounded-xl border border-slate-700 shadow-lg">
+                        <table class="w-full text-left border-collapse text-sm md:text-base">
+                            <thead>
+                                <tr class="bg-slate-950 text-slate-200">
+                                    <th class="py-4 px-5 border-b border-slate-700 w-1/4">目標類別</th>
+                                    <th class="py-4 px-5 border-b border-slate-700 w-1/4">代表性打擊設施</th>
+                                    <th class="py-4 px-5 border-b border-slate-700 w-1/2">戰術毀傷評估與戰略影響</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700 bg-slate-800/80">
+                                <tr class="hover:bg-slate-700/50 transition-colors">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">核子基礎設施</td>
+                                    <td class="py-4 px-5">納坦茲（Natanz）核設施</td>
+                                    <td class="py-4 px-5 text-slate-400">3月2日首次遭襲，衛星影像顯示至少三棟核心建築遭嚴重破壞，實質遲滯了伊朗的鈾濃縮能力與潛在核武裝進程。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors bg-slate-800/40">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">彈道飛彈與無人機生產</td>
+                                    <td class="py-4 px-5">伊瑪目阿里飛彈基地、馬雷克·阿什塔爾航太中心、HESA無人機工廠、國防工業組織 (DIO)</td>
+                                    <td class="py-4 px-5 text-slate-400">針對固體燃料飛彈掩體與無人機組裝線的摧毀，旨在根除伊朗發動大規模飽和式報復攻擊的工業能力，並截斷對代理人的武器供應鏈。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">政權安全與鎮壓機制</td>
+                                    <td class="py-4 px-5">伊斯蘭革命衛隊（IRGC）總部、10個情報部指揮中心、執法司令部（LEC）、巴斯基（Basij）民兵基地</td>
+                                    <td class="py-4 px-5 text-slate-400">這是最具政治意涵的目標選擇。透過摧毀內部維穩力量的指揮節點，聯軍意圖製造內部安全真空，為潛在的國內反政府起義創造條件。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors bg-slate-800/40">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">特種部隊與核心決策層</td>
+                                    <td class="py-4 px-5">IRGC特種部隊總部（3月5日第12波打擊）</td>
+                                    <td class="py-4 px-5 text-slate-400">3月5日由約90架以色列戰機組成的第12波攻擊，使用約200枚彈藥針對40個目標進行打擊，重點癱瘓特種部隊的行動能力。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>美國國防部長皮特·赫格塞斯（Pete Hegseth）在五角大廈的簡報中以極度強硬且升級性的辭令（Escalatory rhetoric）描述戰局。他強調任務目標是「雷射般精準」的，旨在摧毀飛彈、海軍與安全基礎設施，並宣稱美軍「才剛剛開始狩獵、拆解與摧毀」伊朗的能力，甚至形容伊朗政權已經是「烤土司」（toast）。</p>
+                    <p class="text-danger-400 font-medium">然而，這種無限制的空中轟炸也帶來了沉重的人道代價。根據人權組織與伊朗政府的統計，截至3月5日，空襲已導致全國至少1,230名平民喪生，其中包括超過180名兒童。聯合國更接獲報告指出，位於伊朗南部的 Shajareh Tayyebeh 學校遭到空襲，據傳造成大量學童傷亡，世界衛生組織（WHO）亦核實了13起針對醫療基礎設施的襲擊，凸顯了全面戰爭下平民保護機制的徹底失靈。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="ch3" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">03</span>
+                    領導層斬首戰略與德ఙ蘭的權力真空危機
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>「史詩狂怒行動」不僅是一場旨在摧毀硬體的軍事戰役，更是一場精心策劃的政治斬首行動。在衝突爆發的首日，美以聯軍憑藉美國中央情報局（CIA）提供的精準定位情報，成功針對德黑蘭的一處地下掩體發動鑽地打擊，當場擊斃了伊朗最高領袖阿亞圖拉·阿里·哈米尼（Ayatollah Ali Khamenei）。這場史無前例的斬首行動同時導致伊朗總統、軍隊參謀長以及高達49名政權高層領導人喪生，瞬間在德黑蘭的政治中樞製造了巨大的權力真空。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">繼承危機與內部安全維穩</h3>
+                    <p>哈米尼在過去三十多年間，建立了一個被情報界稱為「國中之國」的龐大體系，這個由約4,000名死忠親信組成的網絡牢牢掌控著國家的軍事、情報與經濟命脈。他的猝死使得這個複雜的權力結構面臨瞬間解體的風險。為了穩定瀕臨崩潰的國家體制，伊朗殘存高層迅速成立了「臨時領導委員會」（Interim Leadership Council），由前議長阿里·拉里賈尼（Ali Larijani）出面主持大局。該委員會的首要戰略是將這場針對統治階層的戰爭，重新定調為對整個波斯民族生存的攻擊，試圖透過激發強烈的民族主義情感來掩蓋統治集團內部的裂痕與恐慌。</p>
+                    <p>與此同時，負責選出新任最高領袖的專家會議（Assembly of Experts）正在極度混亂的戰時狀態下緊急運作。外界普遍推測，已故領袖之子穆吉塔巴·哈米尼（Mojtaba Khamenei）是極具競爭力的潛在繼承人選之一。然而，以色列國防部長以色列·卡茨（Israel Katz）公開發出極端威脅，宣稱任何被選出接替哈米尼的繼承人，都將自動成為以色列「明確的暗殺目標」。這種將敵國未來元首預先列入暗殺名單的戰略威懾，使得伊朗的權力繼承過程不僅充滿政治角力，更伴隨著致命的物理風險。</p>
+                    <p>面對外部的軍事斬首與內部的潛在動亂，伊朗政權的鎮壓機器開始高速運轉。伊朗司法總監莫赫塞尼-埃傑伊（Gholam-Hossein Mohseni-Eje'i）發表了嚴厲的公開警告，宣布在衝突期間任何企圖與「敵人」合作的個人或團體，都將被以叛國罪視為國家公敵，預示著政權在過渡期間將採取更為極端與血腥的內部清洗手段來確保忠誠。此外，出於安全考量以及防空能力的徹底喪失，伊朗政府被迫無限期推遲了原定為哈米尼舉行的為期三天的全國國葬，這對一個高度依賴宗教儀式與群眾動員來展現統治合法性的神權政體而言，無疑是巨大的政治羞辱與打擊。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="ch4" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">04</span>
+                    水下領域的歷史性交鋒與 IRIS Dena 號沉沒事件
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>在確保波斯灣與荷莫茲海峽航行自由的戰略框架下，美軍將「徹底殲滅伊朗海軍」設定為核心作戰目標之一。截至3月2日，美國中央司令部已宣布摧毀了阿曼灣內的所有12艘伊朗海軍艦艇，並癱瘓了其海軍總部。然而，整場海戰中最具震撼力、且對全球海軍戰略產生深遠影響的事件，發生在數千英里外的印度洋深水區。</p>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 relative overflow-hidden my-8 shadow-inner">
+                        <div class="absolute -right-10 -top-10 opacity-5">
+                            <i class="fas fa-ship text-9xl"></i>
+                        </div>
+                        <p class="relative z-10">3月4日清晨5時30分左右，一艘美國海軍的核子動力快速攻擊潛艦（SSN）在距離斯里蘭卡南部城市加勒（Galle）約20至40海浬的國際水域（位處斯里蘭卡專屬經濟區內），對伊朗海軍南方艦隊的最新型穆傑級（Moudge-class）巡防艦「迪納號」（IRIS Dena）發動了致命打擊。美軍潛艦發射了一枚單一的 Mk 48 重型線導魚雷，該魚雷的設計並非簡單穿透船殼，而是在目標艦艇的龍骨下方引爆，利用高達650磅的爆炸當量產生毀滅性的氣泡脈衝效應，瞬間將軍艦「抬起」並折斷其結構。美國國防部隨後釋出的潛望鏡紅外線影像證實了艦艉發生的巨大爆炸，該艦隨後迅速沉沒入海。</p>
+                    </div>
+                    <p>此一沉船事件造成了嚴重的人員傷亡。據斯里蘭卡當局與外電報導，艦上估計載有180名官兵，其中至少80人陣亡，斯里蘭卡海軍救起32名傷患，另有約60人下落不明。國防部長赫格塞斯以此為傲，冷酷地形容這是一場「安靜的死亡」，並宣稱美國已經實質性地消除了伊朗在該戰區的重大海軍存在，累計已擊沉17艘伊朗海軍艦艇。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">IRIS Dena 號沉沒的深層戰略與外交意涵</h3>
+                    <p>這場攻擊在軍事歷史與地緣政治上具有劃時代的意義。首先，這是自第二次世界大戰結束以來，美國潛艦首次在實戰中擊沉敵方艦艇，同時也是人類海戰史上首次由核動力攻擊潛艦使用導引魚雷取得的實戰擊殺紀錄。此舉極大地展示了美軍水下兵力無遠弗屆的全球投射能力，證明了即使敵方艦艇遠離主戰場並航行於廣袤的國際水域，仍無法逃脫美軍的隱蔽打擊網路。</p>
+                    <p>其次，該事件引發了嚴重的外交副作用，首當其衝的便是印度。IRIS Dena 號在遇襲前，才剛剛作為貴賓參加了印度海軍在維沙卡帕特南（Visakhapatnam）主辦的「2026年國際閱艦式」（International Fleet Review 2026），並正在返航伊朗的途中。在距離斯里蘭卡海岸僅幾十海浬處發生此類戰爭行為，讓新德里陷入了極度尷尬的外交困境：印度是否事先掌握了美國核潛艦在其周邊海域的伏擊動態？如果不知情，這將嚴重暴露印度在「水下領域感知」（Underwater Domain Awareness）能力上的致命缺陷；如果知情甚至默許，這將徹底破壞印度與伊朗的雙邊關係，並損害印度作為不結盟大國與全球南方領袖的戰略信譽。這場遠洋擊殺不僅是對伊朗的軍事打擊，更是美國對印太地區所有潛在競爭對手發出的一次強烈威懾信號。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 5 -->
+            <section id="ch5" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">05</span>
+                    衝突的區域外溢效應與代理人網路的連鎖反應
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>面對美以聯軍的壓倒性空中優勢，伊朗政權深知在傳統軍事層面無法與之抗衡。因此，伊朗迅速啟動了代號為「真實承諾 IV」（Operation True Promise IV）的非對稱反擊戰略，動員其遍布中東的「抵抗軸心」（Axis of Resistance）代理人網絡，試圖透過極限的區域外溢效應來增加美國及其盟友的戰爭成本，迫使國際社會介入調停。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">波斯灣的飽和攻擊與防空危機</h3>
+                    <p>波斯灣的阿拉伯國家成為了伊朗報復的首要目標。沙烏地阿拉伯、阿拉伯聯合大公國（UAE）、科威特與卡達等國境內的美軍基地與關鍵基礎設施遭遇了密集的無人機與彈道飛彈襲擊。3月5日，阿聯國防部證實，其防空系統在單日內便偵測並攔截了高達131架自殺式無人機與6枚彈道飛彈，首都阿布達比甚至有6名平民因攔截碎片的墜落而受傷。這種高強度的飽和式攻擊（Saturation attack）對海灣國家的防禦體系造成了極大的壓力，區域官員私下向媒體透露，海灣盟國的防空攔截彈庫存正在以危險的速度耗盡。更令這些國家感到不安的是，美國在沙烏地與阿聯等關鍵盟國的駐在地竟然缺乏常駐大使，這在危機時刻嚴重阻礙了高層級的戰略協調與資源調度。</p>
+
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">戰線的地理擴張：從高加索到地中海</h3>
+                    <ul class="list-disc pl-6 space-y-3 marker:text-brand-500">
+                        <li><strong>北方戰線：</strong>伊朗的武裝無人機首次侵犯了其北方鄰國亞塞拜然的領空，並分別擊中了納希切萬（Nakhchivan）機場的航廈以及 Shekarabad 村的一所學校，造成兩名平民受傷。亞塞拜然外交部對此提出強烈抗議，這使得原本就因納戈爾諾-卡拉巴赫問題而脆弱的高加索地區局勢雪上加霜。</li>
+                        <li><strong>西方戰線：</strong>黎巴嫩真主黨配合德黑蘭的指令，大幅增加了對以色列北部的飛彈襲擊。作為反制，以色列國防軍（IDF）除了進行轟炸外，其地面部隊已開始越境推進至黎巴嫩邊境城鎮。一架疑似由真主黨發射的「見證者」（Shahed）無人機甚至襲擊了位於地中海島國賽普勒斯的英國皇家空軍基地，顯示代理人網絡具備打擊歐洲邊緣地帶的長程投射能力。</li>
+                        <li><strong>其他區域：</strong>伊拉克境內的親伊民兵也對美軍發動襲擊，並揚言將戰線擴大至約旦；葉門胡塞武裝則準備將其海上襲擾活動從紅海延伸至非洲之角。</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">內部顛覆與庫德族武裝起義</h3>
+                    <p>美國的「政權更迭」戰略並非僅依賴空中轟炸，其更深層的圖謀在於煽動伊朗內部的少數民族與反對派起義。軍事專家指出，歷史上沒有任何政權僅憑空中戰役而被推翻，必須伴隨內部的政治崩潰或地面力量的介入。自3月4日起，多份情報來源與媒體披露，數千名武裝精良的伊朗裔庫德族戰士已經從伊拉克北部的庫德斯坦自治區越過邊境，在伊朗西北部發動了地面攻勢。</p>
+                    <p>據美國有線電視新聞網（CNN）報導，美國中央情報局（CIA）正積極與伊朗庫德斯坦民主黨（KDPI）等組織秘密接觸，商討提供實質軍事援助的計畫，川普總統甚至親自與伊拉克庫德族領袖進行了通話。儘管白宮強烈否認了這些報導，但伊朗革命衛隊已將此視為實質威脅，迅速出動無人機對伊拉克邊境的庫德族陣地實施了先發制人的轟炸。這條隱蔽的「內部戰線」，正成為決定伊朗政權生死存亡的關鍵變數。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="ch6" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">06</span>
+                    全球經濟與金融震盪：能源、股市與匯率危機
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>波斯灣地區不僅是全球地緣政治的火藥庫，更是全球經濟與金融的心臟。美伊戰爭在短短數日內，便對全球能源市場、外匯匯率與各國股市造成了災難性的連鎖反應。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">原油與天然氣市場的恐慌性飆升</h3>
+                    <p>隨著戰局惡化，全球原油市場陷入了極度恐慌。衝突爆發前，布蘭特原油（Brent crude）價格約為每桶70.77美元；然而至3月4日，價格已飆升逾15%至81.73美元，並在3月5日受伊朗飛彈擊中波斯灣油輪的報導刺激下，進一步突破每桶84美元。國際能源市場的動盪立即傳導至美國國內民生消費端，全國平均汽油價格在不到一週內跳漲30美分，達到每加侖3.25美元，創近11個月新高。</p>
+                    <p>更為致命的威脅來自荷莫茲海峽的實質性封鎖。這條承載全球20%原油與液化天然氣運輸的咽喉要道目前已完全癱瘓。作為全球最大液化天然氣（LNG）出口國之一的卡達，因設施受戰火波及，於3月4日正式援引「不可抗力」條款暫停天然氣出口。這意味著對歐洲與亞洲客戶的合約無限期解除，導致歐洲天然氣期貨價格瞬間跳漲，長期更將推高依賴天然氣生產的化肥價格，引發全球性糧食通膨危機。</p>
+
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">國際股市與金融市場的兩極化反應</h3>
+                    <p>戰爭爆發初期，全球股市遭遇了劇烈的恐慌性拋售。亞洲市場首當其衝，韓國 Kospi 指數在週二（3月3日）崩跌 12.1%，創下史上最大單日跌幅，日本日經指數與歐洲各大股市也面臨重挫。美國華爾街股市在初期同樣遭遇血洗，道瓊工業指數一度暴跌超過 1,200 點。</p>
+                    <p>然而，隨著資金轉向防禦性資產與科技板塊，美股展現出強大的韌性。截至3月4日與3月5日，在輝達（Nvidia）、亞馬遜等大型科技股支撐，以及美國國內經濟數據強韌的帶動下，標普 500 指數與那斯達克指數均出現反彈。地緣政治的極端風險促使全球資金瘋狂湧入避險資產，美元指數（DXY）突破 99 關卡，國際現貨黃金價格攀升至每盎司 5,176 美元以上的高位，美國 10 年期公債殖利率也被推升至 4.11% 至 4.13% 區間。</p>
+
+                    <!-- Table 2 -->
+                    <div class="overflow-x-auto my-8 rounded-xl border border-slate-700 shadow-lg">
+                        <table class="w-full text-left border-collapse text-sm md:text-base">
+                            <thead>
+                                <tr class="bg-slate-950 text-slate-200">
+                                    <th class="py-4 px-5 border-b border-slate-700">關鍵經濟與金融指標</th>
+                                    <th class="py-4 px-5 border-b border-slate-700">衝突前基線數據 (約2月下旬)</th>
+                                    <th class="py-4 px-5 border-b border-slate-700">戰時狀態 (截至3月5日)</th>
+                                    <th class="py-4 px-5 border-b border-slate-700">全球市場與供應鏈影響評估</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700 bg-slate-800/80">
+                                <tr class="hover:bg-slate-700/50 transition-colors">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">布蘭特原油價格</td>
+                                    <td class="py-4 px-5">約 $70.77 / 桶</td>
+                                    <td class="py-4 px-5 text-danger-400 font-bold">突破 $84.00 / 桶</td>
+                                    <td class="py-4 px-5 text-slate-400">飆升逾18%，反映市場對荷莫茲海峽長期封鎖的極端風險定價。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors bg-slate-800/40">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">美元指數 (DXY)</td>
+                                    <td class="py-4 px-5">約 97-98 區間</td>
+                                    <td class="py-4 px-5 text-green-400 font-bold">突破 99.01</td>
+                                    <td class="py-4 px-5 text-slate-400">避險資金大量湧入推升美元，導致歐元與英鎊等主要非美貨幣全面承壓重挫。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">全球股市表現</td>
+                                    <td class="py-4 px-5">高檔震盪</td>
+                                    <td class="py-4 px-5">韓國暴跌12.1%，美股V型反彈</td>
+                                    <td class="py-4 px-5 text-slate-400">戰爭引發亞歐股市恐慌殺盤，美股則在科技股與經濟數據撐盤下展現韌性，走勢嚴重分化。</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/50 transition-colors bg-slate-800/40">
+                                    <td class="py-4 px-5 font-semibold text-brand-300">天然氣供應 (卡達)</td>
+                                    <td class="py-4 px-5">正常穩定出口</td>
+                                    <td class="py-4 px-5 text-danger-400 font-bold">宣布「不可抗力」暫停出口</td>
+                                    <td class="py-4 px-5 text-slate-400">引發歐洲天然氣期貨上漲，長期將導致化肥減產及全球糧食價格攀升。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 7 -->
+            <section id="ch7" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">07</span>
+                    美國國內政治危機與憲政權力博弈
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>隨著「史詩狂怒行動」的戰火蔓延，其所引發的政治震盪也猛烈衝擊著華盛頓的權力核心。川普政府在未經國會正式授權的情況下發動大規模戰爭，不僅挑戰了美國憲法的分權制衡原則，更引發了對《戰爭權力法案》（War Powers Resolution）效力的歷史性測試。</p>
+                    
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">參議院的表決與黨派分裂</h3>
+                    <p>面對可能陷入另一場中東「無休止戰爭」（Forever war）的恐懼，國會民主黨人與部分保守派孤立主義者迅速採取行動。3月4日，由維吉尼亞州民主黨參議員提姆·凱恩（Tim Kaine）與肯塔基州共和黨參議員蘭德·保羅（Rand Paul）共同發起的《戰爭權力決議案》在參議院進行表決，該法案旨在強制總統終止未經授權的對伊軍事行動。</p>
+                    <p>在表決前，川普政府展開了密集的政治遊說。然而，民主黨參議員克里斯·墨菲（Chris Murphy）警告，這場戰爭的目標不斷游移（Mission creep），且行政部門拒絕排除派遣地面部隊的可能性，這可能讓美國重蹈在阿富汗與利比亞的覆轍。最終，該法案以47票贊成、53票反對的微弱差距未能通過。這場投票高度反映了當前的黨派極化現象，但也出現了兩個極具象徵意義的跨黨派倒戈：共和黨的蘭德·保羅堅守其反干涉主義立場投下贊成票；而民主黨的約翰·費特曼（John Fetterman）則因其極度親以色列的立場投下反對票，其極端鷹派的論調顯示出美國國內政治光譜在面對以色列與伊朗問題時的嚴重撕裂。</p>
+
+                    <h3 class="text-xl font-bold text-white mt-8 mb-4">眾議院的挑戰與公眾輿論的反撲</h3>
+                    <p>參議院的挫敗並未終結立法部門的抗爭。3月5日，眾議院準備對一項類似的戰爭權力決議案進行表決。儘管共和黨籍眾議院議長麥克·強生（Mike Johnson）試圖將支持戰爭與通過國土安全部（DHS）預算案綑綁操作，但微弱的席次差距使得表決結果充滿變數。</p>
+                    <p>國會的動盪實則反映了美國公眾對這場戰爭的強烈抗拒。根據 CBS 新聞的最新民意調查，高達69%的美國民眾認為總統必須獲得國會授權才能繼續軍事行動，且52%的受訪者明確反對對伊朗發動空襲，僅有39%表示支持。這種民意反彈很大程度上源於美國子弟兵的傷亡。截至3月5日，五角大廈已證實有6名美軍在衝突中陣亡。鮮血的代價與不斷攀升的國內汽油價格交織在一起，正對川普政府的連任基礎與「美國優先」（America First）承諾構成嚴峻的內部挑戰。</p>
+                </div>
+            </section>
+
+            <!-- Chapter 8 -->
+            <section id="ch8" class="scroll-mt-24 group">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <span class="text-brand-500 font-black">08</span>
+                    全球外交板塊重組與大國戰略反應
+                </h2>
+                <div class="space-y-5 text-lg text-slate-300">
+                    <p>美伊戰爭的爆發徹底撕裂了原本就脆弱的國際共識，迫使全球大國在新的地緣政治斷層線上重新選邊站。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
+                        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                            <h4 class="text-brand-400 font-bold mb-3"><i class="fas fa-hand-paper mr-2"></i>反對與譴責陣營：中國與俄羅斯</h4>
+                            <p class="text-sm">中國與俄羅斯對美以的單邊軍事行動表達了強烈譴責。中國官方論述聚焦於呼籲停火與對話，並未展現出為德黑蘭提供實質軍事或經濟掩護的意圖，主要考量為「一帶一路」的商業利益與保護僑民。俄羅斯指責美以追求非法的「政權更迭」，但深陷烏克蘭戰場的俄羅斯，其實際能提供給伊朗的戰略槓桿已經見底，暴露了其在中東的戰略無力感。</p>
+                        </div>
+                        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                            <h4 class="text-brand-400 font-bold mb-3"><i class="fas fa-handshake mr-2"></i>支持與歐洲的分歧</h4>
+                            <p class="text-sm">加拿大與澳大利亞公開表態支持，英國重申了堅不可摧的英美「特殊關係」並提供防禦協助。然而，歐洲大陸內部卻出現了嚴重分歧。西班牙堅定維持「對戰爭說不」的左翼和平主義立場，公開反抗美國威脅；相對地，德國則選擇了深化與以色列的防務綁定，計畫擴大對北約部隊的採購方案以間接支持以色列。</p>
+                        </div>
+                    </div>
+
+                    <p>聯合國秘書長安東尼奧·古特瑞斯（António Guterres）在絕望中重申《聯合國憲章》禁止使用武力與威脅領土完整的基本原則，警告衝突的擴大將對區域穩定帶來無可挽回的災難。對於如印度等不結盟大國而言，這場戰爭是一場外交夢魘。印度不僅依賴中東的能源供應與僑匯，更面臨了 IRIS Dena 號剛離開自家港口便遭美國潛艦擊沉的戰略難題，凸顯了全球南方國家在大國博弈夾縫中的脆弱與無奈。</p>
+                </div>
+            </section>
+
+            <!-- Conclusion -->
+            <section id="conclusion" class="scroll-mt-24 mb-16">
+                <div class="bg-gradient-to-r from-brand-900/40 to-slate-800/40 p-8 md:p-10 rounded-2xl border border-brand-500/30 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -left-6 -bottom-6 opacity-10">
+                        <i class="fas fa-quote-left text-9xl"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-8 relative z-10 flex items-center gap-3">
+                        <i class="fas fa-flag-checkered text-brand-400"></i>
+                        結論與戰略前瞻
+                    </h2>
+                    <div class="space-y-6 text-lg text-slate-300 relative z-10">
+                        <p>總結2026年2月28日至3月5日的戰事發展，「史詩狂怒行動」已經深刻且不可逆地改變了中東的地緣政治面貌。綜合上述分析，可得出以下幾點核心結論：</p>
+                        
+                        <ul class="space-y-4 mt-4">
+                            <li class="flex items-start gap-4">
+                                <div class="bg-brand-500/20 p-2 rounded-lg text-brand-400 mt-1"><i class="fas fa-bolt"></i></div>
+                                <div>
+                                    <strong class="text-white">「空中政權更迭」的理論迷思與內部動盪：</strong> 
+                                    美以聯軍成功從物理上摧毀了伊朗的戰略防禦與指揮中樞，達成了戰術上的輝煌勝利。然而，歷史證明單純的空中戰役極難直接導致極權政府的徹底崩潰。一個失去傳統軍事威懾力、深感生存受威脅的後哈米尼時代政權，必將更加依賴恐怖主義、代理人戰爭與非對稱打擊來維持其統治合法性。
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="bg-danger-500/20 p-2 rounded-lg text-danger-400 mt-1"><i class="fas fa-chart-line"></i></div>
+                                <div>
+                                    <strong class="text-white">全球化供應鏈的脆弱性與經濟疤痕：</strong> 
+                                    荷莫茲海峽的實質性封鎖與卡達天然氣的斷供，證明了區域衝突能在瞬間轉化為全球性的經濟危機。能源價格的結構性上漲將嚴重拖累全球經濟復甦，並對歐美的執政黨帶來災難性的國內政治反撲。
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="bg-slate-600/50 p-2 rounded-lg text-slate-300 mt-1"><i class="fas fa-gavel"></i></div>
+                                <div>
+                                    <strong class="text-white">國際法體系的崩潰與權力政治的復歸：</strong> 
+                                    此次未經安理會授權、繞過美國國會的先發制人打擊，徹底撕裂了二戰後建立的國際法約束機制。它向全球發出了一個危險的信號：在核武器門檻之下，擁有壓倒性軍事優勢的大國可以基於單方面的安全認知，對主權國家實施無限制的動力學摧毀。
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <div class="pt-6 mt-6 border-t border-slate-700/50 text-slate-400 italic font-medium">
+                            未來的戰局發展，將不再僅僅取決於美軍能投下多少枚精準導引炸彈，而是取決於德黑蘭權力真空的填補速度、美國國內反戰民意的發酵程度，以及全球經濟對這場人造能源危機的承受極限。這場始於「消除核威脅」的戰爭，已經打開了重塑21世紀權力秩序的潘朵拉之盒。
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <footer class="border-t border-slate-800 pt-8 pb-12 text-center text-slate-500 text-sm">
+                <p>&copy; 2026 Strategic Assessment Group. All content is for analytical review purposes.</p>
+                <p class="mt-2 text-xs">Generated by Lex AI Assistant.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JavaScript 交互 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 目錄複製到 Mobile 選單
+            const desktopToc = document.getElementById('toc').innerHTML;
+            document.getElementById('mobileToc').innerHTML = desktopToc;
+
+            // Mobile Menu Toggle
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const closeBtn = document.getElementById('closeMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileLinks = document.querySelectorAll('#mobileToc a');
+
+            function toggleMenu() {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('flex');
+            }
+
+            mobileBtn.addEventListener('click', toggleMenu);
+            closeBtn.addEventListener('click', toggleMenu);
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+
+            // 滾動監聽 (進度條與目錄高亮)
+            const sections = document.querySelectorAll('section');
+            const progressBar = document.getElementById('progressBar');
+            
+            window.addEventListener('scroll', () => {
+                // 進度條計算
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                progressBar.style.width = scrolled + "%";
+
+                // 目錄高亮計算
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= (sectionTop - 300)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                // 更新 Desktop TOC
+                updateTocHighlight('#toc a', current);
+                // 更新 Mobile TOC
+                updateTocHighlight('#mobileToc a', current);
+            });
+
+            function updateTocHighlight(selector, currentSection) {
+                const navLinks = document.querySelectorAll(selector);
+                navLinks.forEach(link => {
+                    // 移除高亮狀態
+                    link.classList.remove('text-brand-400', 'font-bold');
+                    link.classList.add('text-slate-400');
+                    
+                    // 控制圖示
+                    const icon = link.querySelector('i');
+                    if(icon) icon.classList.add('opacity-0');
+
+                    // 若與當前章節匹配則加入高亮
+                    if (link.getAttribute('href') === '#' + currentSection) {
+                        link.classList.remove('text-slate-400');
+                        link.classList.add('text-brand-400', 'font-bold');
+                        if(icon) icon.classList.remove('opacity-0');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
