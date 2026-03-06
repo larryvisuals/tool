@@ -82,12 +82,23 @@
     <!-- 主要內容區 (左右分屏) -->
     <main class="flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-hidden">
 
-        <!-- 左側：代碼編輯區 -->
+        <!-- 左側：代碼編輯區與快速編輯區 -->
         <section class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="bg-slate-50 border-b border-gray-200 px-4 py-2 flex justify-between items-center">
-                <span class="font-semibold text-slate-700 text-sm">Mermaid 原始碼</span>
-                <button onclick="copyCode()"
-                    class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1 rounded shadow-sm transition-colors text-slate-600 flex items-center gap-1">
+            <!-- 頁籤切換與工具區 -->
+            <div class="bg-slate-100 border-b border-gray-200 px-4 pt-2 flex justify-between items-end">
+                <div class="flex space-x-1 font-sans">
+                    <button id="tab-code"
+                        class="px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm">
+                        代碼模式
+                    </button>
+                    <button id="tab-form"
+                        class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]">
+                        視覺化填表
+                    </button>
+                </div>
+                <div class="pb-1.5 flex items-center gap-2">
+                    <button onclick="copyCode(event)"
+                        class="text-xs bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded shadow-sm transition-colors text-slate-600 flex items-center gap-1">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
@@ -96,6 +107,9 @@
                     複製代碼
                 </button>
             </div>
+            </div>
+
+            <!-- 原生代碼輸入框 -->
             <textarea id="mermaid-input"
                 class="flex-1 w-full p-4 resize-none outline-none font-mono text-sm leading-relaxed text-slate-700 bg-slate-50 focus:bg-white transition-colors"
                 spellcheck="false">
@@ -141,6 +155,11 @@ flowchart TD
     class E,J finance;
     class I cs;
             </textarea>
+
+            <!-- 視覺化填表容器 -->
+            <div id="form-container" class="flex-1 w-full p-4 overflow-y-auto hidden bg-slate-50">
+                <!-- 透過 JavaScript 動態生成表單 -->
+            </div>
         </section>
 
         <!-- 右側：預覽與錯誤提示區 -->
@@ -184,7 +203,7 @@ flowchart TD
                     </div>
 
                     <!-- 匯出按鈕 -->
-                    <button onclick="exportToPNG()"
+                    <button onclick="exportToPNG(event)"
                         class="ml-auto xl:ml-2 text-xs bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -237,7 +256,6 @@ flowchart TD
             flowchart: {
                 useMaxWidth: false,
                 htmlLabels: true,
-                    // 將 curve 從 'basis' 更改為 'linear'，因為 basis 曲線在節點距離過近又帶有標籤時，會引發 D3 的計算錯誤
                     curve: 'linear'
             }
         });
@@ -246,6 +264,7 @@ flowchart TD
         // 首次初始化
         initMermaid();
 
+        // DOM 元素選取
         const inputElement = document.getElementById('mermaid-input');
         const outputElement = document.getElementById('mermaid-output');
         const errorContainer = document.getElementById('error-container');
@@ -253,13 +272,21 @@ flowchart TD
         const bgColorPicker = document.getElementById('bg-color-picker');
         const themeSelect = document.getElementById('theme-select');
         const patternSelect = document.getElementById('pattern-select');
+        const tabCode = document.getElementById('tab-code');
+        const tabForm = document.getElementById('tab-form');
+        const formContainer = document.getElementById('form-container');
 
         let timeoutId;
 
-        // 核心渲染函數
+        // 用於視覺化填表的狀態變數
+        let currentTemplate = '';
+        let currentNodes = [];
+
+        // ------------------
+        // 核心渲染功能
+        // ------------------
         async function renderDiagram() {
             const code = inputElement.value.trim();
-
             if (!code) {
                 outputElement.innerHTML = '';
                 errorContainer.classList.add('hidden');
@@ -275,24 +302,139 @@ flowchart TD
                 console.error(error);
                 errorContainer.classList.remove('hidden');
                 let errorText = error.message || error.str || '未知的語法錯誤';
-                errorText = errorText.replace(/<[^>]*>?/gm,'');
+                // 修正：改用 new RegExp 字串宣告，避免 /<[^>]*>?/gm 遭 HTML 解析器誤判導致 g 被當作未定義變數
+                errorText = errorText.replace(new RegExp('<[^>]*>?','gm'),'');
                 errorMessage.textContent = errorText;
             }
         }
 
-        // 監聽輸入框變化
         inputElement.addEventListener('input',() => {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(renderDiagram,300);
         });
 
-        // 監聽圖表主題變化
+        // ------------------
+        // 視覺化填表解析功能
+        // ------------------
+        function parseMermaid(code) {
+            let nodes = [];
+            let counter = 0;
+
+            // 安全地解析各種括號內容與連線文字 (全面改用 new RegExp 字串寫法防護)
+            const regexes = [
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\[)(.+?)(\\]\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' }, // ([...])
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\()(.+?)(\\)\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' }, // ((...))
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\[)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },     // [...]
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\{)(.+?)(\\})','g'),type: '判斷',icon: 'M12 2l10 10-10 10L2 12 12 2z' },     // {...}
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\()(.+?)(\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },     // (...)
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*>)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },      // >...]
+                { regex: new RegExp('(--[ \\t]*)([^->\\n]+?)([ \\t]*-->)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' },       // -- text -->
+                { regex: new RegExp('(-->\\|)([^|\\n]+)(\\|)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' }                   // -->|text|
+            ];
+
+            let templateLines = code.split('\n').map(line => {
+                // 略過註解與樣式定義
+                if (line.trim().startsWith('%%') || line.trim().startsWith('classDef')) return line;
+
+                let l = line;
+                regexes.forEach(({ regex,type,icon }) => {
+                    l = l.replace(regex,(match,p1,p2,p3) => {
+                        // 如果已經被替換過或是空白的，就跳過
+                        if (!p2.trim() || p2.includes('__TOKEN_')) return match;
+                        let id = `__TOKEN_${counter++}__`;
+                        nodes.push({ id,text: p2.trim(),type: type,icon: icon });
+                        return p1 + id + p3;
+                    });
+                });
+                return l;
+            });
+
+            return { template: templateLines.join('\n'),nodes };
+        }
+
+        function buildForm() {
+            const { template,nodes } = parseMermaid(inputElement.value);
+            currentTemplate = template;
+            currentNodes = nodes;
+
+            if (nodes.length === 0) {
+                formContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                        <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-sm font-medium">找不到可編輯的文字標籤</span>
+                        <span class="text-xs mt-1">請切換回代碼模式新增節點結構</span>
+                    </div>`;
+                return;
+            }
+
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-10">';
+            nodes.forEach((node,idx) => {
+                let badgeColor = node.type === '判斷' ? 'bg-orange-100 text-orange-700' :
+                    node.type === '路線' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
+
+                html += `
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col hover:border-indigo-200 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full ${node.type === '判斷' ? 'bg-orange-300' : node.type === '路線' ? 'bg-emerald-300' : 'bg-blue-300'}"></div>
+                        <div class="flex items-center gap-1.5 mb-2 pl-2">
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest ${badgeColor}">${node.type}</span>
+                        </div>
+                        <input type="text" data-idx="${idx}" value="${node.text}" placeholder="請輸入文字..." 
+                               class="form-input w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all">
+                    </div>
+                `;
+            });
+            html += '</div>';
+            formContainer.innerHTML = html;
+
+            // 綁定輸入事件
+            const inputs = formContainer.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('input',(e) => {
+                    const idx = e.target.getAttribute('data-idx');
+                    currentNodes[idx].text = e.target.value;
+                    updateCodeFromForm();
+                });
+            });
+        }
+
+        function updateCodeFromForm() {
+            let finalCode = currentTemplate;
+            currentNodes.forEach(node => {
+                // 將使用者輸入的內容反填回代碼 (如果被清空則填入空白格避免語法錯誤)
+                finalCode = finalCode.replace(node.id,node.text || ' ');
+            });
+            inputElement.value = finalCode;
+
+            // 觸發即時預覽
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(renderDiagram,300);
+        }
+
+        // ------------------
+        // UI 事件監聽
+        // ------------------
+
+        // 頁籤切換邏輯
+        tabCode.addEventListener('click',() => {
+            tabCode.className = "px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm";
+            tabForm.className = "px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]";
+            inputElement.classList.remove('hidden');
+            formContainer.classList.add('hidden');
+        });
+
+        tabForm.addEventListener('click',() => {
+            tabForm.className = "px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm";
+            tabCode.className = "px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]";
+            inputElement.classList.add('hidden');
+            formContainer.classList.remove('hidden');
+            buildForm();
+        });
+
+        // 樣式設定監聽
         themeSelect.addEventListener('change',(e) => {
             currentTheme = e.target.value;
-            initMermaid(); // 重新載入設定
-            renderDiagram(); // 重新渲染圖表
-
-            // 自動適配暗色模式的背景 (提升 UX)
+            initMermaid();
+            renderDiagram();
             if (currentTheme === 'dark' && bgColorPicker.value === '#ffffff') {
                 bgColorPicker.value = '#1e293b';
                 outputElement.style.backgroundColor = '#1e293b';
@@ -302,46 +444,48 @@ flowchart TD
             }
         });
 
-        // 監聽背景顏色變化
         bgColorPicker.addEventListener('input',(e) => {
             outputElement.style.backgroundColor = e.target.value;
         });
 
-        // 監聽畫布樣式變化
         patternSelect.addEventListener('change',(e) => {
             outputElement.classList.remove('bg-pattern-dots','bg-pattern-grid','bg-pattern-none');
             outputElement.classList.add(e.target.value);
         });
 
-        // 全局複製代碼函數
-        window.copyCode = function () {
+        // ------------------
+        // 全局操作功能 
+        // ------------------
+        window.copyCode = function (event) {
             inputElement.select();
             document.execCommand('copy');
-
             const btn = event.currentTarget;
             const originalHTML = btn.innerHTML;
             btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已複製!`;
             btn.classList.add('bg-green-100','text-green-700','border-green-300');
-
             setTimeout(() => {
                 btn.innerHTML = originalHTML;
                 btn.classList.remove('bg-green-100','text-green-700','border-green-300');
             },1500);
         }
 
-        // 匯出圖片函數
-        window.exportToPNG = function () {
+        window.exportToPNG = function (event) {
             const svgElement = outputElement.querySelector('svg');
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+
             if (!svgElement) {
-                alert('沒有可匯出的圖表！');
+                btn.innerHTML = `無圖表可匯出`;
+                btn.classList.add('bg-red-100','text-red-700','border-red-300');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-red-100','text-red-700','border-red-300');
+                },1500);
                 return;
             }
 
-            const btn = event.currentTarget;
-            const originalHTML = btn.innerHTML;
             btn.innerHTML = `<svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 處理中...`;
 
-            // 取得 SVG 的尺寸
             const viewBox = svgElement.getAttribute('viewBox');
             let width = svgElement.getBoundingClientRect().width;
             let height = svgElement.getBoundingClientRect().height;
@@ -352,18 +496,15 @@ flowchart TD
                 height = Math.max(height,parseFloat(parts[3]));
             }
 
-            // 複製 SVG 節點以防止影響原來的 DOM
             const clone = svgElement.cloneNode(true);
             clone.setAttribute('width',width);
             clone.setAttribute('height',height);
 
-            // 將 SVG 轉為字串
             const svgData = new XMLSerializer().serializeToString(clone);
             const blob = new Blob([svgData],{ type: 'image/svg+xml;charset=utf-8' });
             const url = URL.createObjectURL(blob);
 
             const canvas = document.createElement('canvas');
-            // 提高解析度 (Retina scale) 以獲得更清晰的圖片
             const scale = 2;
             canvas.width = width * scale;
             canvas.height = height * scale;
@@ -372,15 +513,11 @@ flowchart TD
 
             const img = new Image();
             img.onload = function () {
-                // 畫上背景色
                 ctx.fillStyle = bgColorPicker.value;
                 ctx.fillRect(0,0,width,height);
-
-                // 將 SVG 畫在 Canvas 上
                 ctx.drawImage(img,0,0,width,height);
                 URL.revokeObjectURL(url);
 
-                // 匯出成 PNG 並觸發下載
                 const pngUrl = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = pngUrl;
@@ -389,7 +526,6 @@ flowchart TD
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
 
-                // 恢復按鈕狀態
                 btn.innerHTML = originalHTML;
             };
             img.src = url;
