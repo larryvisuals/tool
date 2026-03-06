@@ -75,6 +75,30 @@
             <h1 class="text-xl font-bold tracking-wide">Mermaid 邏輯流程圖即時編輯器</h1>
         </div>
         <div class="text-sm text-slate-300 flex items-center gap-2">
+            <!-- 清除代碼按鈕 -->
+            <button onclick="clearSavedCode(event)" title="清除儲存的代碼並恢復預設值"
+                class="text-xs bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/50 px-2 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                    </path>
+                </svg>
+                清除代碼
+            </button>
+            <!-- 清除設定按鈕 -->
+            <button onclick="clearSavedSettings(event)" title="清除儲存的樣式設定並恢復預設值"
+                class="text-xs bg-orange-600/20 hover:bg-orange-600/40 text-orange-300 border border-orange-500/50 px-2 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                清除設定
+            </button>
+            <div class="w-px h-4 bg-slate-600 mx-1"></div>
+
             <!-- 儲存至本地資料庫按鈕 -->
             <button onclick="saveToLocal(event)"
                 class="text-xs bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium">
@@ -86,7 +110,7 @@
                 儲存設定
             </button>
 
-            <!-- 分享連結按鈕 (新增) -->
+            <!-- 分享連結按鈕 -->
             <button onclick="shareLink(event)"
                 class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500 px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium mr-2">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,13 +133,13 @@
         <section class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="bg-slate-100 border-b border-gray-200 px-4 pt-2 flex justify-between items-end">
                 <div class="flex space-x-1 font-sans">
-                    <button id="tab-code"
-                        class="px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm">
-                        代碼模式
-                    </button>
                     <button id="tab-form"
+                        class="px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm">
+                        視覺化填表
+                    </button>
+                    <button id="tab-code"
                         class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]">
-                        視覺化填表 <span class="text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded ml-1">New</span>
+                        代碼模式
                     </button>
                 </div>
                 <div class="pb-1.5 flex items-center gap-2">
@@ -132,7 +156,7 @@
             </div>
 
             <textarea id="mermaid-input"
-                class="flex-1 w-full p-4 resize-none outline-none font-mono text-sm leading-relaxed text-slate-700 bg-slate-50 focus:bg-white transition-colors"
+                class="flex-1 w-full p-4 resize-none outline-none font-mono text-sm leading-relaxed text-slate-700 bg-slate-50 focus:bg-white transition-colors hidden"
                 spellcheck="false">
 %% 銷退明細流程圖
 flowchart TD
@@ -171,7 +195,7 @@ class E,J finance;
 class I cs;
             </textarea>
 
-            <div id="form-container" class="flex-1 w-full p-4 overflow-y-auto hidden bg-slate-50">
+            <div id="form-container" class="flex-1 w-full p-4 overflow-y-auto bg-slate-50">
             </div>
         </section>
 
@@ -250,6 +274,43 @@ class I cs;
 
         let currentTheme = 'default';
 
+        // 預設代碼備份，用於清除時恢復
+        const defaultCode = `%% 銷退明細流程圖
+flowchart TD
+%% 核心起點
+A[確認銷退明細] --> B{實體退貨}
+
+%% 第一層分支
+B -->|是:實體退回 | C[倉庫確定收到退貨]
+B -->|否：不退貨 / 折讓| F[賣方開立銷退折讓單]
+
+%% 第二層平行步驟
+C --> D1[銷退折讓單送簽核]
+
+%% 第三層與右側分流
+D1 --> E[財務執行：銷貨退回]
+F --> H{折讓方式}
+
+%% 右側最終執行
+H -->|交換| J[財務執行：折讓]
+H -->|存證| I[CS 執行：折讓]
+
+J --> D2[銷退折讓單送簽核]
+I --> D2[銷退折讓單送簽核]
+
+D2 --> G[送財務部]
+
+%% 狀態與角色樣式定義 (UI/UX 視覺優化)
+classDef default fill:#f9f9f9,stroke:#666,stroke-width:2px;
+classDef finance fill:#ffebee,stroke:#d32f2f,stroke-width:2px;
+classDef cs fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+classDef decision fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+
+%% 套用樣式
+class B,H decision;
+class E,J finance;
+class I cs;`;
+
         // ✅ 資安修復：跳脫函式，防止 XSS
         function escapeHTML(str) {
             if (!str) return '';
@@ -265,7 +326,7 @@ class I cs;
                 securityLevel: 'strict', // 允許渲染標籤尺寸，安全防護由 escapeHTML 和 CSP 負責
                 flowchart: {
                     useMaxWidth: false,
-                    htmlLabels: true,
+                    htmlLabels: false, // 修復 D3 calcLabelPosition 錯誤：禁用 HTML 標籤，改用純 SVG 標籤，可徹底根除圖表連線標籤定位失敗的問題
                     curve: 'linear'
                 }
             });
@@ -303,8 +364,85 @@ class I cs;
         }
 
         // ------------------
-        // 分享與本地儲存功能
+        // 分享與本地儲存清除功能
         // ------------------
+        window.clearSavedCode = function (event) {
+            if (confirm('確定要清除儲存的代碼並恢復預設流程圖嗎？')) {
+                const savedData = localStorage.getItem('mermaid_editor_data');
+                let newData = { code: defaultCode };
+
+                if (savedData) {
+                    try {
+                        const parsedData = JSON.parse(savedData);
+                        newData = { ...parsedData,code: defaultCode };
+                    } catch (e) { }
+                }
+
+                localStorage.setItem('mermaid_editor_data',JSON.stringify(newData));
+                inputElement.value = defaultCode;
+
+                if (!formContainer.classList.contains('hidden')) {
+                    buildForm();
+                } else {
+                    renderDiagram();
+                }
+
+                // UI 狀態回饋
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已清除!`;
+                btn.classList.add('bg-red-600','text-white','border-red-500');
+                btn.classList.remove('bg-red-600/20','text-red-300','border-red-500/50');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-red-600','text-white','border-red-500');
+                    btn.classList.add('bg-red-600/20','text-red-300','border-red-500/50');
+                },1500);
+            }
+        };
+
+        window.clearSavedSettings = function (event) {
+            if (confirm('確定要清除自訂的樣式設定（主題、背景）並恢復預設嗎？')) {
+                const savedData = localStorage.getItem('mermaid_editor_data');
+                let codeToKeep = inputElement.value;
+
+                if (savedData) {
+                    try {
+                        const parsedData = JSON.parse(savedData);
+                        if (parsedData.code) codeToKeep = parsedData.code;
+                    } catch (e) { }
+                }
+
+                // 只保留代碼，覆蓋其他設定
+                localStorage.setItem('mermaid_editor_data',JSON.stringify({ code: codeToKeep }));
+
+                // 恢復預設設定 UI
+                currentTheme = 'default';
+                themeSelect.value = 'default';
+                patternSelect.value = 'bg-pattern-dots';
+                bgColorPicker.value = '#ffffff';
+
+                outputElement.classList.remove('bg-pattern-grid','bg-pattern-none');
+                outputElement.classList.add('bg-pattern-dots');
+                outputElement.style.backgroundColor = '#ffffff';
+
+                initMermaid();
+                renderDiagram();
+
+                // UI 狀態回饋
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已清除!`;
+                btn.classList.add('bg-orange-600','text-white','border-orange-500');
+                btn.classList.remove('bg-orange-600/20','text-orange-300','border-orange-500/50');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('bg-orange-600','text-white','border-orange-500');
+                    btn.classList.add('bg-orange-600/20','text-orange-300','border-orange-500/50');
+                },1500);
+            }
+        };
+
         window.shareLink = function (event) {
             const dataToShare = {
                 c: inputElement.value,
@@ -697,6 +835,9 @@ class I cs;
 
         // 頁面載入時啟動流程：優先讀取網址分享設定 -> 若無則讀取本地儲存 -> 執行渲染
         loadState();
+
+        // 初始化時預設載入表單
+        buildForm();
         renderDiagram();
     </script>
 </body>
