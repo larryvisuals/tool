@@ -73,9 +73,21 @@
             </svg>
             <h1 class="text-xl font-bold tracking-wide">Mermaid 邏輯流程圖即時編輯器</h1>
         </div>
-        <div class="text-sm text-slate-300 flex items-center gap-2">
+        <div class="text-sm text-slate-300 flex items-center gap-3">
+            <!-- 儲存至本地資料庫按鈕 -->
+            <button onclick="saveToLocal(event)"
+                class="text-xs bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 px-3 py-1.5 rounded shadow-sm transition-colors flex items-center gap-1 font-medium">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                    </path>
+                </svg>
+                儲存設定
+            </button>
+            <div class="flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-            支援即時渲染與語法除錯
+                <span class="hidden md:inline">支援即時渲染與語法除錯</span>
+            </div>
         </div>
     </header>
 
@@ -93,7 +105,7 @@
                     </button>
                     <button id="tab-form"
                         class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]">
-                        視覺化填表
+                        視覺化填表 <span class="text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded ml-1">New</span>
                     </button>
                 </div>
                 <div class="pb-1.5 flex items-center gap-2">
@@ -283,6 +295,71 @@ flowchart TD
         let currentNodes = [];
 
         // ------------------
+        // 本地資料庫 (localStorage) 讀寫功能
+        // ------------------
+        window.saveToLocal = function (event) {
+            // 將所有設定打包成 JSON
+            const dataToSave = {
+                code: inputElement.value,
+                theme: currentTheme,
+                pattern: patternSelect.value,
+                bgColor: bgColorPicker.value
+            };
+
+            // 寫入瀏覽器本地儲存
+            localStorage.setItem('mermaid_editor_data',JSON.stringify(dataToSave));
+
+            // UI 按鈕狀態反饋
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 已儲存!`;
+            btn.classList.add('bg-green-600','border-green-500');
+            btn.classList.remove('bg-slate-700','border-slate-600');
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-green-600','border-green-500');
+                btn.classList.add('bg-slate-700','border-slate-600');
+            },1500);
+        };
+
+        function loadFromLocal() {
+            const savedData = localStorage.getItem('mermaid_editor_data');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+
+                    // 還原代碼
+                    if (data.code) {
+                        inputElement.value = data.code;
+                    }
+
+                    // 還原主題
+                    if (data.theme) {
+                        currentTheme = data.theme;
+                        themeSelect.value = data.theme;
+                        initMermaid();
+                    }
+
+                    // 還原背景樣式
+                    if (data.pattern) {
+                        patternSelect.value = data.pattern;
+                        outputElement.classList.remove('bg-pattern-dots','bg-pattern-grid','bg-pattern-none');
+                        outputElement.classList.add(data.pattern);
+                    }
+
+                    // 還原背景顏色
+                    if (data.bgColor) {
+                        bgColorPicker.value = data.bgColor;
+                        outputElement.style.backgroundColor = data.bgColor;
+                    }
+                } catch (e) {
+                    console.error('無法解析本地存檔設定：',e);
+                }
+            }
+        }
+
+        // ------------------
         // 核心渲染功能
         // ------------------
         async function renderDiagram() {
@@ -302,7 +379,6 @@ flowchart TD
                 console.error(error);
                 errorContainer.classList.remove('hidden');
                 let errorText = error.message || error.str || '未知的語法錯誤';
-                // 修正：改用 new RegExp 字串宣告，避免 /<[^>]*>?/gm 遭 HTML 解析器誤判導致 g 被當作未定義變數
                 errorText = errorText.replace(new RegExp('<[^>]*>?','gm'),'');
                 errorMessage.textContent = errorText;
             }
@@ -320,26 +396,23 @@ flowchart TD
             let nodes = [];
             let counter = 0;
 
-            // 安全地解析各種括號內容與連線文字 (全面改用 new RegExp 字串寫法防護)
             const regexes = [
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\[)(.+?)(\\]\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' }, // ([...])
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\()(.+?)(\\)\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' }, // ((...))
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\[)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },     // [...]
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\{)(.+?)(\\})','g'),type: '判斷',icon: 'M12 2l10 10-10 10L2 12 12 2z' },     // {...}
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\()(.+?)(\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },     // (...)
-                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*>)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },      // >...]
-                { regex: new RegExp('(--[ \\t]*)([^->\\n]+?)([ \\t]*-->)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' },       // -- text -->
-                { regex: new RegExp('(-->\\|)([^|\\n]+)(\\|)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' }                   // -->|text|
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\[)(.+?)(\\]\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\(\\()(.+?)(\\)\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\[)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\{)(.+?)(\\})','g'),type: '判斷',icon: 'M12 2l10 10-10 10L2 12 12 2z' },
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*\\()(.+?)(\\))','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },
+                { regex: new RegExp('([a-zA-Z0-9_-]+[ \\t]*>)(.+?)(\\])','g'),type: '節點',icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z' },
+                { regex: new RegExp('(--[ \\t]*)([^->\\n]+?)([ \\t]*-->)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' },
+                { regex: new RegExp('(-->\\|)([^|\\n]+)(\\|)','g'),type: '路線',icon: 'M17 8l4 4m0 0l-4 4m4-4H3' }
             ];
 
             let templateLines = code.split('\n').map(line => {
-                // 略過註解與樣式定義
                 if (line.trim().startsWith('%%') || line.trim().startsWith('classDef')) return line;
 
                 let l = line;
                 regexes.forEach(({ regex,type,icon }) => {
                     l = l.replace(regex,(match,p1,p2,p3) => {
-                        // 如果已經被替換過或是空白的，就跳過
                         if (!p2.trim() || p2.includes('__TOKEN_')) return match;
                         let id = `__TOKEN_${counter++}__`;
                         nodes.push({ id,text: p2.trim(),type: type,icon: icon });
@@ -386,7 +459,6 @@ flowchart TD
             html += '</div>';
             formContainer.innerHTML = html;
 
-            // 綁定輸入事件
             const inputs = formContainer.querySelectorAll('.form-input');
             inputs.forEach(input => {
                 input.addEventListener('input',(e) => {
@@ -400,12 +472,10 @@ flowchart TD
         function updateCodeFromForm() {
             let finalCode = currentTemplate;
             currentNodes.forEach(node => {
-                // 將使用者輸入的內容反填回代碼 (如果被清空則填入空白格避免語法錯誤)
                 finalCode = finalCode.replace(node.id,node.text || ' ');
             });
             inputElement.value = finalCode;
 
-            // 觸發即時預覽
             clearTimeout(timeoutId);
             timeoutId = setTimeout(renderDiagram,300);
         }
@@ -413,8 +483,6 @@ flowchart TD
         // ------------------
         // UI 事件監聽
         // ------------------
-
-        // 頁籤切換邏輯
         tabCode.addEventListener('click',() => {
             tabCode.className = "px-4 py-2 text-sm font-semibold text-blue-700 bg-white border-t border-l border-r border-gray-200 rounded-t-md relative top-[1px] shadow-sm";
             tabForm.className = "px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-gray-50 border-t border-l border-r border-transparent rounded-t-md transition-colors relative top-[1px]";
@@ -430,7 +498,6 @@ flowchart TD
             buildForm();
         });
 
-        // 樣式設定監聽
         themeSelect.addEventListener('change',(e) => {
             currentTheme = e.target.value;
             initMermaid();
@@ -531,7 +598,8 @@ flowchart TD
             img.src = url;
         };
 
-        // 頁面載入時首次渲染
+        // 頁面載入時：先讀取本地儲存，再渲染圖表
+        loadFromLocal();
         renderDiagram();
     </script>
 </body>
